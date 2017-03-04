@@ -74,9 +74,9 @@ for index, lines  in enumerate(zipped) :
 	for index2,lines2 in enumerate(lines):
 		#print lines2
 		if( computeDistance(lines2, posx ) < 0.1) :
-			candidates.append(index)
-			#print get_perp(linex2[0],linex2[1])
-			print "Found a candidate"
+			if index not in candidates:
+				candidates.append(index)
+				print "Found a candidate"
 	
 print candidates
 #TEST
