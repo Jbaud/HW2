@@ -28,7 +28,7 @@ def floatify(x):
 	except ValueError:
 		return x
 
-posx = (51.496868217364,9.38602223061025)
+posx = (50.7646892778575,8.84615432471037)
 
 
 def computeDistance( a , b ) :
