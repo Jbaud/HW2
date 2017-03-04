@@ -82,7 +82,7 @@ candidates = []
 for index, lines  in enumerate(zipped) : 
 	for index2,lines2 in enumerate(lines):
 		#print lines2
-		if( computeDistance(lines2, posx ) < 0.1) :
+		if( computeDistance(lines2, posx ) < 0.15) :
 			if index not in candidates:
 				candidates.append(index)
 				print "Found a candidate"
@@ -108,6 +108,40 @@ print " and distance associated"
 print distances
 print "computed probabilities"
 print spatial_analysis
+
+
+#compute for another point - will need to create functions to do that
+
+posy = (51.497267531231,9.38445162959397)
+print "     ======================================== new point ========================================"
+
+candidates2 = []
+for index, lines  in enumerate(zipped) : 
+	for index2,lines2 in enumerate(lines):
+		#print lines2
+		if( computeDistance(lines2, posy ) < 0.15) :
+			if index not in candidates2:
+				candidates2.append(index)
+				print "Found a candidate"
+	
+print candidates2
+
+projections2 =[]
+distances2 = []
+spatial_analysis2 = []
+# compute the ci's -> the projections for the candidates beacon point
+for index2,candidate2 in enumerate(candidates2):
+	projections2.append(get_perp(zipped[candidate2][1][0],zipped[candidate2][1][1],zipped[candidate2][0][0],zipped[candidate2][0][1],posy[0],posy[1]))
+	distances2.append(computeDistance(posy,projections2[index2] ))
+	spatial_analysis2.append( normpdf(distances2[index2],0,20))
+
+print "Below, the projections found : "
+print projections2
+print " and distance associated"
+print distances2
+print "computed probabilities"
+print spatial_analysis2
+
 
 
 # we now want to compute the spatial analysis (5.2)
