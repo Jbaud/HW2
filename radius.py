@@ -6,20 +6,20 @@ import re
 from itertools import tee, izip
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
-    """************************************************************************************************ 
-    Purpose - X1,Y1,X2,Y2 = Two points representing the ends of the line segment
-              X3,Y3 = The offset point 
-    'Returns - X4,Y4 = Returns the Point on the line perpendicular to the offset or None if no such
-                        point exists
-    '************************************************************************************************ """
-    XX = X2 - X1 
-    YY = Y2 - Y1 
-    ShortestLength = ((XX * (X3 - X1)) + (YY * (Y3 - Y1))) / ((XX * XX) + (YY * YY)) 
-    X4 = X1 + XX * ShortestLength 
-    Y4 = Y1 + YY * ShortestLength
-    if X4 < X2 and X4 > X1 and Y4 < Y2 and Y4 > Y1:
-        return X4,Y4
-    return None
+	"""************************************************************************************************ 
+	Purpose - X1,Y1,X2,Y2 = Two points representing the ends of the line segment
+			  X3,Y3 = The offset point 
+	'Returns - X4,Y4 = Returns the Point on the line perpendicular to the offset or None if no such
+						point exists
+	'************************************************************************************************ """
+	XX = X2 - X1 
+	YY = Y2 - Y1 
+	ShortestLength = ((XX * (X3 - X1)) + (YY * (Y3 - Y1))) / ((XX * XX) + (YY * YY)) 
+	X4 = X1 + XX * ShortestLength 
+	Y4 = Y1 + YY * ShortestLength
+	#if X4 < X2 and X4 > X1 and Y4 < Y2 and Y4 > Y1:
+	return X4,Y4
+	#return None
 
 def floatify(x):
 	" convert a list to float"
@@ -74,8 +74,12 @@ for index, lines  in enumerate(zipped) :
 	for index2,lines2 in enumerate(lines):
 		#print lines2
 		if( computeDistance(lines2, posx ) < 0.1) :
-			candidates.append(names[index])
+			candidates.append(index)
+			#print get_perp(linex2[0],linex2[1])
 			print "Found a candidate"
 	
 print candidates
+#TEST
+print str(zipped[0][0][0]) + " , " + str(zipped[0][0][1]) + " and " + str(zipped[0][1][0]) + " , " + str(zipped[0][1][1] )+ " and " + str (posx[0]) + " , " +str(posx[1])
+print get_perp(zipped[0][1][0],zipped[0][1][1],zipped[0][0][0],zipped[0][0][1],posx[0],posx[1])
 
