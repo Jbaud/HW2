@@ -5,10 +5,21 @@ import re
 
 from itertools import tee, izip
 
-
-#
-i = 1
-#
+def get_perp( X1, Y1, X2, Y2, X3, Y3):
+    """************************************************************************************************ 
+    Purpose - X1,Y1,X2,Y2 = Two points representing the ends of the line segment
+              X3,Y3 = The offset point 
+    'Returns - X4,Y4 = Returns the Point on the line perpendicular to the offset or None if no such
+                        point exists
+    '************************************************************************************************ """
+    XX = X2 - X1 
+    YY = Y2 - Y1 
+    ShortestLength = ((XX * (X3 - X1)) + (YY * (Y3 - Y1))) / ((XX * XX) + (YY * YY)) 
+    X4 = X1 + XX * ShortestLength 
+    Y4 = Y1 + YY * ShortestLength
+    if X4 < X2 and X4 > X1 and Y4 < Y2 and Y4 > Y1:
+        return X4,Y4
+    return None
 
 def floatify(x):
 	" convert a list to float"
