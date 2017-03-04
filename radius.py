@@ -2,7 +2,8 @@ from haversine import haversine
 import csv
 import sys
 import re
-
+import math
+import scipy.stats
 from itertools import tee, izip
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
@@ -21,6 +22,14 @@ def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	return X4,Y4
 	#return None
 
+def normpdf(x, mean, sd):
+	var = float(sd)**2
+	pi = 3.1415926
+	denom = (2*pi*var)**.5
+	num = math.exp(-(float(x)-float(mean))**2/(2*var))
+	return num/denom
+
+
 def floatify(x):
 	" convert a list to float"
 	try:
@@ -28,7 +37,7 @@ def floatify(x):
 	except ValueError:
 		return x
 
-posx = (50.7646892778575,8.84615432471037)
+posx = (51.496868217364,9.38602223061025)
 
 
 def computeDistance( a , b ) :
@@ -49,7 +58,7 @@ test = [x.split(",,",1)[0]  for x in test]
 
 # delete the end of line separator
 test = [x.replace(" ,,", "")  for x in test]
-print test[0:10]
+#print test[0:10]
 # delete the extra space 
 test = [x.replace(" |", "|")  for x in test]
 # add , between long and lat
@@ -79,7 +88,34 @@ for index, lines  in enumerate(zipped) :
 				print "Found a candidate"
 	
 print candidates
-#TEST
-print str(zipped[0][0][0]) + " , " + str(zipped[0][0][1]) + " and " + str(zipped[0][1][0]) + " , " + str(zipped[0][1][1] )+ " and " + str (posx[0]) + " , " +str(posx[1])
-print get_perp(zipped[0][1][0],zipped[0][1][1],zipped[0][0][0],zipped[0][0][1],posx[0],posx[1])
 
+projections =[]
+distances = []
+spatial_analysis = []
+# compute the ci's -> the projections for the candidates beacon point
+for index,candidate in enumerate(candidates):
+	projections.append(get_perp(zipped[candidate][1][0],zipped[candidate][1][1],zipped[candidate][0][0],zipped[candidate][0][1],posx[0],posx[1]))
+	distances.append(computeDistance(posx,projections[index] ))
+	spatial_analysis.append( normpdf(distances[index],0,20))
+
+	
+
+
+
+print "Below, the projections found : "
+print projections
+print " and distance associated"
+print distances
+print "computed probabilities"
+print spatial_analysis
+
+
+# we now want to compute the spatial analysis (5.2)
+
+
+
+'''
+#TEST
+print str(zipped[133400][0][0]) + " , " + str(zipped[133400][0][1]) + " and " + str(zipped[133400][1][0]) + " , " + str(zipped[133400][1][1] )+ " and " + str (posx[0]) + " , " +str(posx[1])
+print get_perp(zipped[133400][1][0],zipped[133400][1][1],zipped[133400][0][0],zipped[133400][0][1],posx[0],posx[1])
+'''
