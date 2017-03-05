@@ -5,8 +5,11 @@ import re
 import math
 import scipy.stats
 from itertools import tee, izip
+import networkx as nx
+import matplotlib.pyplot as plt
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
+	" Compute the projection"
 	"""************************************************************************************************ 
 	Purpose - X1,Y1,X2,Y2 = Two points representing the ends of the line segment
 			  X3,Y3 = The offset point 
@@ -23,6 +26,7 @@ def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	#return None
 
 def normpdf(x, mean, sd):
+	" Compute the probability (standart deviation)"
 	var = float(sd)**2
 	pi = 3.1415926
 	denom = (2*pi*var)**.5
@@ -37,12 +41,41 @@ def floatify(x):
 	except ValueError:
 		return x
 
-posx = (51.496868217364,9.38602223061025)
+def getShortestPath(pointA, pointB):
+	" return the size of the shortest path, A and B should be the value name of the link and not it's index"
+	return len(nx.shortest_path(G,source=int(pointA),target=int(pointB)))
 
 
 def computeDistance( a , b ) :
 	" Compute the distance (km) between two points"
 	return haversine(a, b)
+
+
+def computeCandidates(posx):
+	"Compute the candidates + projection + distances (to projection) + spatial_analysis (normal proba) for a beacon UNDER < 150 meters"
+	candidates = []
+	for index, lines  in enumerate(zipped) : 
+		for index2,lines2 in enumerate(lines):
+			#print lines2
+			if( computeDistance(lines2, posx ) < 0.15) :
+				if index not in candidates:
+					candidates.append(index)
+					print "Found a candidate"
+	
+	print candidates
+
+	projections =[]
+	distances = []
+	spatial_analysis = []
+	# compute the ci's -> the projections for the candidates beacon point
+	for index,candidate in enumerate(candidates):
+		projections.append(get_perp(zipped[candidate][1][0],zipped[candidate][1][1],zipped[candidate][0][0],zipped[candidate][0][1],posx[0],posx[1]))
+		distances.append(computeDistance(posx,projections[index] ))
+		spatial_analysis.append( normpdf(distances[index],0,20))
+	return candidate,projections,distances,spatial_analysis
+	
+
+posx = (51.496868217364,9.38602223061025)
 
 with open(sys.argv[1]) as f:
 	content = f.readlines()
@@ -52,6 +85,13 @@ content = [x.strip() for x in content]
 names =  [x.split(',')[0] for x in content]
 names2 = [x.split(',')[1] for x in content]
 names3 = [x.split(',')[2] for x in content]
+
+# stores the links as [ " a b" ," c d" , ...]
+# used to search shortest links
+result = [a +" "+ b for a, b in zip(names2, names3)]
+#populate the graph with the links
+G = nx.parse_edgelist(result[0:4], nodetype = int)
+
 # get the coordinates
 test = [x.split("0.0,",1)[1]  for x in content]
 # strip the / and replace by " , "
@@ -73,7 +113,7 @@ test = [x.split(",")   for x in test ]
 
 # convert to float
 test2 = [[floatify(x) for x in row] for row in test]
-# convert to tuples
+# convert to  list of tuples
 zipped = [zip(x[0::2], x[1::2]) for x in test2]
 
 #print zipped[0:1000]
@@ -145,9 +185,14 @@ print distances2
 print "computed probabilities"
 print spatial_analysis2
 
+# compute the proba with the previous position
+# example to be automated
 
-'''
-#TEST
-print str(zipped[133400][0][0]) + " , " + str(zipped[133400][0][1]) + " and " + str(zipped[133400][1][0]) + " , " + str(zipped[133400][1][1] )+ " and " + str (posx[0]) + " , " +str(posx[1])
-print get_perp(zipped[133400][1][0],zipped[133400][1][1],zipped[133400][0][0],zipped[133400][0][1],posx[0],posx[1])
-'''
+# done for only one point, need to be done for all 
+print "from "+ names2[candidates[0]] + " to : " + names2[candidates[3]]
+print " here :"
+print result[0:4]
+V = computeDistance(posx,posy)/getShortestPath(names2[candidates[0]],names2[candidates[3]])
+print "this is the probability:"
+print V
+
