@@ -48,7 +48,10 @@ with open(sys.argv[1]) as f:
 	content = f.readlines()
 # you may also want to remove whitespace characters like `\n` at the end of each line
 content = [x.strip() for x in content]
+
 names =  [x.split(',')[0] for x in content]
+names2 = [x.split(',')[1] for x in content]
+names3 = [x.split(',')[2] for x in content]
 # get the coordinates
 test = [x.split("0.0,",1)[1]  for x in content]
 # strip the / and replace by " , "
@@ -141,11 +144,6 @@ print " and distance associated"
 print distances2
 print "computed probabilities"
 print spatial_analysis2
-
-
-
-# we now want to compute the spatial analysis (5.2)
-
 
 
 '''
