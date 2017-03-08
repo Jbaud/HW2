@@ -52,7 +52,7 @@ def computeDistance( a , b ) :
 	return haversine(a, b)
 
 
-def computeCandidates(posx):
+def computeCandidates(posx,zipped):
 	"Compute the candidates + projection + distances (to projection) + spatial_analysis (normal proba) for a beacon UNDER < 150 meters"
 	candidates = []
 	for index, lines  in enumerate(zipped) : 
@@ -63,8 +63,9 @@ def computeCandidates(posx):
 					candidates.append(index)
 					print "Found a candidate"
 	
-	print candidates
+	return candidates
 
+	'''
 	projections =[]
 	distances = []
 	spatial_analysis = []
@@ -74,7 +75,7 @@ def computeCandidates(posx):
 		distances.append(computeDistance(posx,projections[index] ))
 		spatial_analysis.append( normpdf(distances[index],0,20))
 	return candidate,projections,distances,spatial_analysis
-	
+	'''
 
 posx = (51.496868217364,9.38602223061025)
 
@@ -133,10 +134,21 @@ longitude = data.longitude.tolist()
 
 print "All files have been parsed."
 all_probes=zip(latitude, longitude)
-print all_probes[0:10]
 
-# ======= ======= We now have a list of tuples to look for ===================================
 
+
+#
+
+all_candidates =  []
+
+#
+
+for index, currentPosition in enumerate(all_probes[0:5]):
+	all_candidates.append(computeCandidates(currentPosition,zipped))
+
+print all_candidates[0:5]
+
+'''
 candidates = []
 for index, lines  in enumerate(zipped) : 
 	for index2,lines2 in enumerate(lines):
@@ -211,4 +223,4 @@ print result[0:4]
 V = computeDistance(posx,posy)/getShortestPath(names2[candidates[0]],names2[candidates[3]])
 print "this is the probability:"
 print V
-
+'''
