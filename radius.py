@@ -79,6 +79,8 @@ posx = (51.496868217364,9.38602223061025)
 
 with open(sys.argv[1]) as f:
 	content = f.readlines()
+# =============== Parse the CSV =================================
+
 # you may also want to remove whitespace characters like `\n` at the end of each line
 content = [x.strip() for x in content]
 
@@ -116,8 +118,7 @@ test2 = [[floatify(x) for x in row] for row in test]
 # convert to  list of tuples
 zipped = [zip(x[0::2], x[1::2]) for x in test2]
 
-#print zipped[0:1000]
-#print computeDistance(zipped[1][1],zipped[1][2])
+f.close()
 
 # ======= ======= We now have a list of tuples to look for ===================================
 
