@@ -77,8 +77,10 @@ def computeCandidates(posx):
 
 posx = (51.496868217364,9.38602223061025)
 
+print "Parsing: " + sys.argv[1]
 with open(sys.argv[1]) as f:
 	content = f.readlines()
+
 # =============== Parse the CSV =================================
 
 # you may also want to remove whitespace characters like `\n` at the end of each line
@@ -92,6 +94,7 @@ names3 = [x.split(',')[2] for x in content]
 # used to search shortest links
 result = [a +" "+ b for a, b in zip(names2, names3)]
 #populate the graph with the links
+print "Creating a graph of all the Links."
 G = nx.parse_edgelist(result[0:4], nodetype = int)
 
 # get the coordinates
@@ -120,6 +123,31 @@ zipped = [zip(x[0::2], x[1::2]) for x in test2]
 
 f.close()
 
+# =============== Parse probes CSV =================================
+print "Parsing: " + sys.argv[2]
+with open(sys.argv[2]) as g:
+	probes = g.readlines()
+
+
+#getting the appropriate columns
+
+probes = [x.strip() for x in content]
+
+sampleID = [x.split(',')[0] for x in content]
+dateTime = [x.split(',')[1] for x in content]
+sourceCode = [x.split(',')[2] for x in content]
+latitudeTMP = [x.split(',')[3] for x in content]
+longitudeTMP = [x.split(',')[4] for x in content]
+altitude = [x.split(',')[5] for x in content]
+speed = [x.split(',')[6] for x in content]
+heading = [x.split(',')[7] for x in content]
+
+latitude = [[floatify(x) for x in row] for row in latitudeTMP]
+longitude = [[floatify(x) for x in row] for row in longitudeTMP]
+
+g.close()
+
+print "All files have been parsed."
 # ======= ======= We now have a list of tuples to look for ===================================
 
 candidates = []
