@@ -7,6 +7,7 @@ import scipy.stats
 from itertools import tee, izip
 import networkx as nx
 import matplotlib.pyplot as plt
+import pandas
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	" Compute the projection"
@@ -124,30 +125,16 @@ zipped = [zip(x[0::2], x[1::2]) for x in test2]
 f.close()
 
 # =============== Parse probes CSV =================================
-print "Parsing: " + sys.argv[2]
-with open(sys.argv[2]) as g:
-	probes = g.readlines()
 
-
-#getting the appropriate columns
-
-probes = [x.strip() for x in content]
-
-sampleID = [x.split(',')[0] for x in content]
-dateTime = [x.split(',')[1] for x in content]
-sourceCode = [x.split(',')[2] for x in content]
-latitudeTMP = [x.split(',')[3] for x in content]
-longitudeTMP = [x.split(',')[4] for x in content]
-altitude = [x.split(',')[5] for x in content]
-speed = [x.split(',')[6] for x in content]
-heading = [x.split(',')[7] for x in content]
-
-latitude = [[floatify(x) for x in row] for row in latitudeTMP]
-longitude = [[floatify(x) for x in row] for row in longitudeTMP]
-
-g.close()
+colnames = ['ID', 'Date', 'Type', 'latitude', 'longitude','altitute','speed','heading']
+data = pandas.read_csv(sys.argv[2], names=colnames)
+latitude = data.latitude.tolist()
+longitude = data.longitude.tolist()
 
 print "All files have been parsed."
+all_probes=zip(latitude, longitude)
+print all_probes[0:10]
+
 # ======= ======= We now have a list of tuples to look for ===================================
 
 candidates = []
