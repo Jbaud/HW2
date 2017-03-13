@@ -55,17 +55,22 @@ def computeDistance( a , b ) :
 def computeCandidates(posx,zipped):
 	"Compute the candidates + projection + distances (to projection) + spatial_analysis (normal proba) for a beacon UNDER < 150 meters"
 	candidates = []
-	for index, lines  in enumerate(zipped) : 
-		for index2,lines2 in enumerate(lines):
-			#print lines2
+	for index_l, links  in enumerate(zipped[0:5]) : 
+		for index_p,link_points in enumerate(links[:-1]):
+			current = get_perp(links[index_p][0],links[index_p][1],links[index_p+1][0],links[index_p+1][1],posx[0],posx[1])
+			if(computeDistance(current, posx ) < 0.15):
+				candidates.append(current)
+				roads[current] = index_l
+	return candidates
+			#roads[link_points] = index_l
+			
+	'''
 			if( computeDistance(lines2, posx ) < 0.15) :
 				if index not in candidates:
 					candidates.append(index)
 					print "Found a candidate"
 	
 	return candidates
-
-	'''
 	projections =[]
 	distances = []
 	spatial_analysis = []
@@ -76,7 +81,7 @@ def computeCandidates(posx,zipped):
 		spatial_analysis.append( normpdf(distances[index],0,20))
 	return candidate,projections,distances,spatial_analysis
 	'''
-
+roads = dict()
 posx = (51.496868217364,9.38602223061025)
 
 print "Parsing: " + sys.argv[1]
@@ -123,6 +128,8 @@ test2 = [[floatify(x) for x in row] for row in test]
 # convert to  list of tuples
 zipped = [zip(x[0::2], x[1::2]) for x in test2]
 
+print zipped[0:10]
+
 f.close()
 
 # =============== Parse probes CSV =================================
@@ -140,13 +147,15 @@ all_probes=zip(latitude, longitude)
 #
 
 all_candidates =  []
-
+all_probabilities = []
 #
 
 for index, currentPosition in enumerate(all_probes[0:5]):
 	all_candidates.append(computeCandidates(currentPosition,zipped))
 
+
 print all_candidates[0:5]
+print roads
 
 '''
 candidates = []
