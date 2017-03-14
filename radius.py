@@ -64,6 +64,25 @@ def computeCandidates(posx,zipped, lower, upper):
 				candidates.append(current)
 				roads[current] = index_l
 	return candidates
+
+def computeTransition(projection, previous):
+	"Compute the likelyhood for an object to move from one point to another"
+	return computeDistance(projection,previous)/getShortestPath(projection,previous)
+
+def spatialAnalysis(candidates, previous_candidates, probabilities, previous probabilities)
+	"Performs spatial analysis for the given probes"
+	#return an array of tuples (origin,destination, probability)
+
+def computeProbCandidates(probe, candidates):
+	"Compute the probabilities for each candidate in candidates to be the right position for probe"
+	probabilities = []
+	for index_c, projection in enumerate(candidates):
+		distance = computeDistance(probe,projection)
+		print "Distance: "
+		print distance
+		current = normpdf(distance,0,0.02)
+		probabilities.append(current)
+	return probabilities
 			#roads[link_points] = index_l
 			
 	'''
@@ -146,8 +165,9 @@ all_probes=zip(latitude, longitude)
 
 #
 
+print "Computing candidates."
+
 all_candidates =  []
-all_probabilities = []
 #
 lower = 0
 upper = 5
@@ -160,9 +180,23 @@ for index, currentPosition in enumerate(all_probes[0:5]):
 		lower += 1
 
 print "Printing Candidates: "
-print all_candidates[0:10]
+print all_candidates[0:5]
 print "Printing Dictionnary: "
 print roads
+
+print "Computing probabilities."
+
+all_probabilities = []
+
+for index, currentPosition in enumerate(all_probes[0:5]):
+	all_probabilities.append(computeProbCandidates(currentPosition,all_candidates[index]))
+
+print "Printing Probabilities: "
+print all_probabilities[0:5]
+
+print "Computing spatial analysis."
+
+
 
 '''
 candidates = []
