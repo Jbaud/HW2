@@ -72,9 +72,9 @@ def computeCandidates(posx,zipped, lower, upper):
 				roads[current] = index_l
 	return candidates
 
-def computeTransition(projection, previous):
-	"Compute the likelyhood for an object to move from one point to another"
-	return computeDistance(projection,previous)/getShortestPath(projection,previous)
+def computeTransition(projection, previous,posx,posy):
+	"2 first args are the road ID and the 2 last are the probes tuples"
+	return computeDistance(posx,posy)/getShortestPath(projection,previous)
 
 
 def computeProbCandidates(probe, candidates):
@@ -88,6 +88,14 @@ def computeProbCandidates(probe, candidates):
 		probabilities.append(current)
 	return probabilities
 
+def NewComputeProbCandidates(probe, candidates,index1,index2):
+	"Compute the probabilities for each candidate in candidates to be the right position for probe"
+	probabilities = 0.0
+	distance = computeDistance(probe,candidates[index1][index2])
+	print "Distance: "
+	print distance
+	return normpdf(distance,0,0.02)
+	
 roads = dict()
 
 print "Parsing: " + sys.argv[1]
@@ -180,3 +188,38 @@ def recursive_len(item):
 
 print " sum of elements"
 print recursive_len(all_candidates)
+
+
+
+def FindMatchedSequence (cisArray):
+	" Main function, get an array of array of Cis (tuples of projected points) and returns a list of optimal path "
+	f = []
+	pre = []
+	# get the total numbe of elements in array
+	#numberOfElements = recursive_len(cisArray)
+	numberoflines = len(cisArray)
+            # will be used later to store size of current line
+            sizeOfCurrentLine = 0
+            sizeofPreviousLine  = 0
+            # alt will stiore the temp value 
+            alt = 0.0
+	#  compute size of the array
+	sizeOfArray = len(cisArray)
+	#  compute the probabilities for the first line only
+	sizeOfFirstLine = len(cisArray[0])
+	
+	for index in range(0,sizeOfFirstLine) :
+		# need a function that  takes a  projected point an returns prob of that projection
+		f[index] = NewComputeProbCandidates(cisArray,0,index)
+	# main algorithm, starts from the second line
+
+	for index in range(1,numberoflines):
+		# size of current line
+		sizeOfCurrentLine = len(cisArray[index])
+		for element in range(0,sizeOfCurrentLine): 
+			max = -999999999.9999999
+			# size of previous line 
+			sizeofPreviousLine = len(cisArray[index -1 ])
+				for elementInPreviousLine in range(0,sizeofPreviousLine): 
+					alt = f[elementInPreviousLine]
+
