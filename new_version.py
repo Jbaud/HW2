@@ -72,9 +72,9 @@ def computeCandidates(posx,zipped, lower, upper):
 				roads[current] = index_l
 	return candidates
 
-def computeTransition(projection, previous,posx,posy):
+def computeTransition(projection, previous, posx, posy):
 	"2 first args are the road ID and the 2 last are the probes tuples"
-	return computeDistance(posx,posy)/getShortestPath(projection,previous)
+	return computeDistance(posx,posy)/getShortestPath(projection, previous)
 
 
 def computeProbCandidates(probe, candidates):

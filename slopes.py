@@ -8,6 +8,7 @@ from itertools import tee, izip
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas
+import scipy.stats
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	" Compute the projection"
@@ -28,11 +29,11 @@ def get_perp( X1, Y1, X2, Y2, X3, Y3):
 
 def normpdf(x, mean, sd):
 	" Compute the probability (standart deviation)"
-	var = float(sd)**2
+	'''var = float(sd)**2
 	pi = 3.1415926
 	denom = (2*pi*var)**.5
-	num = math.exp(-(float(x)-float(mean))**2/(2*var))
-	return num/denom
+	num = math.exp(-(float(x)-float(mean))**2/(2*var))'''
+	return scipy.stats.norm(mean, sd).pdf(x)
 
 
 def floatify(x):
@@ -179,3 +180,13 @@ print all_candidates[0:1]
 
 print "Printing Dictionnary: "
 print roads
+
+print "Computing probabilities."
+
+all_probabilities = []
+
+for index, currentPosition in enumerate(probes_coordinates[0:1]):
+	all_probabilities.append(computeProbCandidates(currentPosition,all_candidates[index]))
+
+print "Printing Probabilities: "
+print all_probabilities[0:1]
