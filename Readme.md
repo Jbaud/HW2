@@ -1,5 +1,13 @@
-TO-DO:
+CS513 Homework 2:
+=================
 
+Rssources:
+---------
+
+https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/Map-Matching20for20Low-Sampling-Rate20GPS20Trajectories-cameraReady.pdf
+
+TO-DO:
+------
 refactor the code
     for now this is mostly a proof a concept, put the code inside functions and generalize the computation for every beacon of one user
 
