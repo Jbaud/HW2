@@ -8,7 +8,7 @@ from itertools import tee, izip
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas
-
+import operator
 
 
 '''
@@ -82,8 +82,8 @@ def computeProbCandidates(probe, candidates):
 	probabilities = []
 	for index_c, projection in enumerate(candidates):
 		distance = computeDistance(probe,projection)
-		print "Distance: "
-		print distance
+		#print "Distance: "
+		#print distance
 		current = normpdf(distance,0,0.02)
 		probabilities.append(current)
 	return probabilities
@@ -92,8 +92,8 @@ def NewComputeProbCandidates(probe, candidates,index1,index2):
 	"Compute the probabilities for each candidate in candidates to be the right position for probe"
 	probabilities = 0.0
 	distance = computeDistance(probe,candidates[index1][index2])
-	print "Distance: "
-	print distance
+	#print "Distance: "
+	#print distance
 	return normpdf(distance,0,0.02)
 
 
@@ -106,13 +106,6 @@ def FindMatchedSequence (cisArray,all_probes):
 
 	for index,line in enumerate(cisArray):
 		pre.append([0.0] * len(line))
-
-	print " f "
-	print f
-	print 'f 1'
-	print f[0]
-	print " new f 1:1"
-	f[0][0] 
 
 	# get the total numbe of elements in array
 	#numberOfElements = recursive_len(cisArray)
@@ -132,29 +125,43 @@ def FindMatchedSequence (cisArray,all_probes):
 		f[0][index] = NewComputeProbCandidates(all_probes[0],cisArray,0,index)
 	# main algorithm, starts from the second line
 
-	print "coucou"
-	print f
+	#print "coucou"
+	#print f
 
 	for index in range(1,numberoflines):
 		# size of current line
 		sizeOfCurrentLine = len(cisArray[index]) 
 		for element in range(0,sizeOfCurrentLine):
-			max = -999999999.9999999
+			max2 = -999999999.9999999
 			# size of previous line
 			sizeofPreviousLine = len(cisArray[index -1 ]) 
 			for elementInPreviousLine in range(0,sizeofPreviousLine):
 
 				alt = f[index-1][elementInPreviousLine] + NewComputeProbCandidates(all_probes[index],cisArray,index,element)
-				print "alt :"  + str(alt)
-				if alt > max:
-					max = alt
+				#print "alt :"  + str(alt)
+				if alt > max2:
+					max2 = alt
 					pre[index][element] = cisArray[index][elementInPreviousLine]
-				print "update :"
-				print f
-				f[index][element] = max
-	print "final"
+				f[index][element] = max2
 	print f
+	print " -----------"
+	print "pre :"
+	print pre
+	#loop back 
+	returnList = []
+	for element in range(numberoflines-1,0,-1):
+		print f[element]
+		index, value = max(enumerate(f[element]), key=operator.itemgetter(1))
+		print str(index) + "   " + str(value) 
+		returnList.append(pre[element][index])
 	
+
+	index2, value2 = max(enumerate(f[0]), key=operator.itemgetter(1))
+	returnList.append(cisArray[0][index2])
+	print " HERE ="	
+	print returnList
+
+
 
 roads = dict()
 
@@ -175,8 +182,8 @@ names3 = [x.split(',')[2] for x in content]
 # used to search shortest links
 result = [a +" "+ b for a, b in zip(names2, names3)]
 #populate the graph with the links
-print "Creating a graph of all the Links."
-G = nx.parse_edgelist(result[0:4], nodetype = int)
+#print "Creating a graph of all the Links."
+#G = nx.parse_edgelist(result[0:4], nodetype = int)
 
 # get the coordinates
 test = [x.split("0.0,",1)[1]  for x in content]
@@ -218,7 +225,7 @@ all_probes=zip(latitude, longitude)
 
 # Now we have parsed all the input files
 
-print "Computing candidates."
+#print "Computing candidates."
 
 all_candidates =  []
 #
@@ -232,10 +239,10 @@ for index, currentPosition in enumerate(all_probes[0:5]):
 	if index > 5:
 		lower += 1
 
-print "Printing Candidates: "
-print all_candidates[0:5]
-print "Printing Dictionnary: "
-print roads
+#print "Printing Candidates: "
+#print all_candidates[0:5]
+#print "Printing Dictionnary: "
+#print roads
 
 
 # tested -> Works
