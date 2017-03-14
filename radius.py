@@ -52,10 +52,12 @@ def computeDistance( a , b ) :
 	return haversine(a, b)
 
 
-def computeCandidates(posx,zipped):
+def computeCandidates(posx,zipped, lower, upper):
 	"Compute the candidates + projection + distances (to projection) + spatial_analysis (normal proba) for a beacon UNDER < 150 meters"
 	candidates = []
-	for index_l, links  in enumerate(zipped[0:5]) : 
+	lower = 0
+	upper = 5
+	for index_l, links  in enumerate(zipped[lower:upper]) :
 		for index_p,link_points in enumerate(links[:-1]):
 			current = get_perp(links[index_p][0],links[index_p][1],links[index_p+1][0],links[index_p+1][1],posx[0],posx[1])
 			if(computeDistance(current, posx ) < 0.15):
@@ -128,8 +130,6 @@ test2 = [[floatify(x) for x in row] for row in test]
 # convert to  list of tuples
 zipped = [zip(x[0::2], x[1::2]) for x in test2]
 
-print zipped[0:10]
-
 f.close()
 
 # =============== Parse probes CSV =================================
@@ -149,12 +149,19 @@ all_probes=zip(latitude, longitude)
 all_candidates =  []
 all_probabilities = []
 #
+lower = 0
+upper = 5
 
 for index, currentPosition in enumerate(all_probes[0:5]):
-	all_candidates.append(computeCandidates(currentPosition,zipped))
 
+	all_candidates.append(computeCandidates(currentPosition,zipped, lower, upper))
+	upper += 1
+	if index > 5:
+		lower += 1
 
-print all_candidates[0:5]
+print "Printing Candidates: "
+print all_candidates[0:10]
+print "Printing Dictionnary: "
 print roads
 
 '''
@@ -168,7 +175,6 @@ for index, lines  in enumerate(zipped) :
 				print "Found a candidate"
 	
 print candidates
-
 projections =[]
 distances = []
 spatial_analysis = []
