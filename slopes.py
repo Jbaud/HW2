@@ -119,18 +119,12 @@ def linksParser(file):
 	latitude  = [[floatify(x) for x in row] for row in latitude]
 	longitude  = [[floatify(x) for x in row] for row in longitude]
 
-	final_lat = []
-	final_long = []
+	road_segments = []
 
-	#Merge the lists
-	for x in latitude:
-		final_lat += x
-
-	for x in longitude:
-		final_long += x
-
-	road_segments = zip(final_lat,final_long)
-
+	for linkx,linky in zip(latitude,longitude):
+		current = zip(linkx,linky)
+		road_segments.append(current)
+	
 def probesParser(file):
 	"Extract relevant infos from the CSV containing the links, also creates a graph of all the links"
 	global probes_data
@@ -142,6 +136,7 @@ def probesParser(file):
 	latitude = probes_data.latitude.tolist()
 	longitude = probes_data.longitude.tolist()
 	probes_coordinates = zip(latitude,longitude)
+
 '''
 List of global variables:
 links_data - Data extracted from the Links CSV using pandas
@@ -154,9 +149,33 @@ probes_coordinates - A list of tuples containing latitude and longitude for each
 print "Parsing: " + sys.argv[1]
 linksParser(sys.argv[1])
 
-print road_segments[0:10]
+print "Printing first 10 segments:"
+print road_segments[0:1]
 
 print "Parsing: " + sys.argv[2]
 probesParser(sys.argv[2])
 
-print probes_coordinates[0:10]
+print "Printing first 10 probes:"
+print probes_coordinates[0:1]
+
+print "All files have been parsed."
+
+print "Computing candidates."
+
+all_candidates =  []
+#
+lower = 0
+upper = 5
+
+for index, currentPosition in enumerate(probes_coordinates[0:1]):
+
+	all_candidates.append(computeCandidates(currentPosition, road_segments, lower, upper))
+	upper += 1
+	if index > 5:
+		lower += 1
+
+print "Printing Candidates for the first 2 probes: "
+print all_candidates[0:1]
+
+print "Printing Dictionnary: "
+print roads
