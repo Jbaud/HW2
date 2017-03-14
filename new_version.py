@@ -18,16 +18,16 @@ python new_version.py Partition6467LinkData.csv Partition6467ProbePoints.csv > o
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	" Compute the projection"
-	"""************************************************************************************************ 
+	"""************************************************************************************************
 	Purpose - X1,Y1,X2,Y2 = Two points representing the ends of the line segment
-			  X3,Y3 = The offset point 
+			  X3,Y3 = The offset point
 	'Returns - X4,Y4 = Returns the Point on the line perpendicular to the offset or None if no such
 						point exists
 	'************************************************************************************************ """
-	XX = X2 - X1 
-	YY = Y2 - Y1 
-	ShortestLength = ((XX * (X3 - X1)) + (YY * (Y3 - Y1))) / ((XX * XX) + (YY * YY)) 
-	X4 = X1 + XX * ShortestLength 
+	XX = X2 - X1
+	YY = Y2 - Y1
+	ShortestLength = ((XX * (X3 - X1)) + (YY * (Y3 - Y1))) / ((XX * XX) + (YY * YY))
+	X4 = X1 + XX * ShortestLength
 	Y4 = Y1 + YY * ShortestLength
 	#if X4 < X2 and X4 > X1 and Y4 < Y2 and Y4 > Y1:
 	return X4,Y4
@@ -95,7 +95,7 @@ def NewComputeProbCandidates(probe, candidates,index1,index2):
 	print "Distance: "
 	print distance
 	return normpdf(distance,0,0.02)
-	
+
 roads = dict()
 
 print "Parsing: " + sys.argv[1]
@@ -128,13 +128,13 @@ test = [x.split(",,",1)[0]  for x in test]
 # delete the end of line separator
 test = [x.replace(" ,,", "")  for x in test]
 #print test[0:10]
-# delete the extra space 
+# delete the extra space
 test = [x.replace(" |", "|")  for x in test]
 # add , between long and lat
 test = [x.replace(" ", ",")  for x in test]
 # delete the pipe (could be done before test)
 test = [x.replace("|", " , ")  for x in test]
-#split the string into list 
+#split the string into list
 test = [x.split(",")   for x in test ]
 
 # convert to float
@@ -201,13 +201,13 @@ def FindMatchedSequence (cisArray):
             # will be used later to store size of current line
             sizeOfCurrentLine = 0
             sizeofPreviousLine  = 0
-            # alt will stiore the temp value 
+            # alt will stiore the temp value
             alt = 0.0
 	#  compute size of the array
 	sizeOfArray = len(cisArray)
 	#  compute the probabilities for the first line only
 	sizeOfFirstLine = len(cisArray[0])
-	
+
 	for index in range(0,sizeOfFirstLine) :
 		# need a function that  takes a  projected point an returns prob of that projection
 		f[index] = NewComputeProbCandidates(cisArray,0,index)
@@ -216,10 +216,13 @@ def FindMatchedSequence (cisArray):
 	for index in range(1,numberoflines):
 		# size of current line
 		sizeOfCurrentLine = len(cisArray[index])
-		for element in range(0,sizeOfCurrentLine): 
+		for element in range(0,sizeOfCurrentLine):
 			max = -999999999.9999999
-			# size of previous line 
+			# size of previous line
 			sizeofPreviousLine = len(cisArray[index -1 ])
-				for elementInPreviousLine in range(0,sizeofPreviousLine): 
+				for elementInPreviousLine in range(0,sizeofPreviousLine):
 					alt = f[elementInPreviousLine]
-
+					if alt > max
+						max = alt
+						pre[element][index] = cisArray[index][elementInPreviousLine]
+					f[element][index] = max
