@@ -9,6 +9,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import pandas
 import scipy.stats
+import operator
 
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	" Compute the projection"
@@ -58,7 +59,6 @@ def computeCandidates(posx,zipped, lower, upper):
 	#Global variables defined in this function
 	global roads
 
-	roads = dict()
 	candidates = []
 	lower = 0
 	upper = 5
@@ -88,6 +88,12 @@ def computeProbCandidates(probe, candidates):
 		current = normpdf(distance,0,0.02)
 		probabilities.append(current)
 	return probabilities
+
+def NewComputeProbCandidates(probe, candidates,index1,index2):
+	"Compute the probabilities for each candidate in candidates to be the right position for probe"
+	probabilities = 0.0
+	distance = computeDistance(probe,candidates[index1][index2])
+	return normpdf(distance,0,0.02)
 
 def linksParser(file):
 	"Extract relevant infos from the CSV containing the links, also creates a graph of all the links"
@@ -138,6 +144,98 @@ def probesParser(file):
 	longitude = probes_data.longitude.tolist()
 	probes_coordinates = zip(latitude,longitude)
 
+
+def buildCSV(line, index):
+	"Build one line of the output CSV"
+	#sampleID
+	out_line = str(probes_data.sampleID[index])
+	out_line += ","
+	#dateTime
+	out_line += str(probes_data.dateTime[index])
+	out_line += ","
+	#sourceCode
+	out_line += str(probes_data.sourceCode[index])
+	out_line += ","
+	#latitude
+	out_line += str(probes_data.latitude[index])
+	out_line += ","
+	#longitude
+	out_line += str(probes_data.longitude[index])
+	out_line += ","	
+	#altitude
+	out_line += str(probes_data.altitude[index])
+	out_line += ","
+	#linkPVID
+	out_line += str(links_data.linkPVID[line])
+	out_line += ","
+	return out_line
+
+def FindMatchedSequence (cisArray,all_probes):
+	" Main function, get an array of array of Cis (tuples of projected points) and returns a list of optimal path "
+	f =  []
+	pre = []
+	for index,line in enumerate(cisArray):
+		f.append([0.0] * len(line))
+
+	for index,line in enumerate(cisArray):
+		pre.append([0.0] * len(line))
+
+	# get the total numbe of elements in array
+	#numberOfElements = recursive_len(cisArray)
+	numberoflines = len(cisArray)
+	# will be used later to store size of current line
+	sizeOfCurrentLine = 0
+	sizeofPreviousLine  = 0
+	# alt will stiore the temp value
+	alt = 0.0
+	#  compute size of the array
+	sizeOfArray = len(cisArray)
+	#  compute the probabilities for the first line only
+	sizeOfFirstLine = len(cisArray[0]) 
+
+	for index in range(0,sizeOfFirstLine) :
+		# need a function that  takes a  projected point an returns prob of that projection
+		f[0][index] = NewComputeProbCandidates(all_probes[0],cisArray,0,index)
+	# main algorithm, starts from the second line
+
+	for index in range(1,numberoflines):
+		# size of current line
+		sizeOfCurrentLine = len(cisArray[index]) 
+		for element in range(0,sizeOfCurrentLine):
+			max2 = -999999999.9999999
+			# size of previous line
+			sizeofPreviousLine = len(cisArray[index -1 ]) 
+			for elementInPreviousLine in range(0,sizeofPreviousLine):
+
+				alt = f[index-1][elementInPreviousLine] + NewComputeProbCandidates(all_probes[index],cisArray,index,element)
+				#print "alt :"  + str(alt)
+				if alt > max2:
+					max2 = alt
+					pre[index][element] = cisArray[index][elementInPreviousLine]
+				f[index][element] = max2
+	'''
+	print f
+	print " -----------"
+	print "pre :"
+	print pre
+	'''
+	#loop back 
+	returnList = []
+	for element in range(numberoflines-1,0,-1):
+		print f[element]
+		index, value = max(enumerate(f[element]), key=operator.itemgetter(1))
+		print str(index) + "   " + str(value) 
+		returnList.append(pre[element][index])
+	
+
+	index2, value2 = max(enumerate(f[0]), key=operator.itemgetter(1))
+	returnList.append(cisArray[0][index2])
+	'''
+	print " HERE ="	
+	print returnList
+	'''
+	return returnList
+
 '''
 List of global variables:
 links_data - Data extracted from the Links CSV using pandas
@@ -147,17 +245,19 @@ probes_data - Data extracted from the Probes CSV using pandas
 probes_coordinates - A list of tuples containing latitude and longitude for each probe
 '''
 
+roads = dict()
+
 print "Parsing: " + sys.argv[1]
 linksParser(sys.argv[1])
 
-print "Printing first 10 segments:"
-print road_segments[0:1]
+print "Printing first 5 segments:"
+print road_segments[0:4]
 
 print "Parsing: " + sys.argv[2]
 probesParser(sys.argv[2])
 
-print "Printing first 10 probes:"
-print probes_coordinates[0:1]
+print "Printing first 5 probes:"
+print probes_coordinates[0:4]
 
 print "All files have been parsed."
 
@@ -168,25 +268,40 @@ all_candidates =  []
 lower = 0
 upper = 5
 
-for index, currentPosition in enumerate(probes_coordinates[0:1]):
+for index, currentPosition in enumerate(probes_coordinates[0:5]):
 
 	all_candidates.append(computeCandidates(currentPosition, road_segments, lower, upper))
 	upper += 1
 	if index > 5:
 		lower += 1
 
-print "Printing Candidates for the first 2 probes: "
-print all_candidates[0:1]
+print "Printing Candidates for the first 5 probes: "
+print all_candidates[0:4]
 
 print "Printing Dictionnary: "
 print roads
 
-print "Computing probabilities."
+print "Finding sequence."
+final_candidates = FindMatchedSequence(all_candidates,probes_coordinates)
 
-all_probabilities = []
+print "Printing the first 5 selected candidates:"
+print final_candidates
 
-for index, currentPosition in enumerate(probes_coordinates[0:1]):
-	all_probabilities.append(computeProbCandidates(currentPosition,all_candidates[index]))
+print "Performing link line number lookup."
+candidate_lines = []
 
-print "Printing Probabilities: "
-print all_probabilities[0:1]
+for candidate in final_candidates:
+	candidate_lines.append(roads[candidate])
+
+print "Lookup result:"
+print candidate_lines
+
+print "Building output csv."
+output_csv = []
+
+for index,line_id in enumerate(candidate_lines):
+	output_csv.append(buildCSV(line_id, index))
+
+print "Output CSV:"
+print output_csv
+
