@@ -60,12 +60,11 @@ def computeCandidates(posx,zipped, lower, upper):
 	global roads
 
 	candidates = []
-	lower = 0
-	upper = 5
+
 	for index_l, links  in enumerate(zipped[lower:upper]) :
 		for index_p,link_points in enumerate(links[:-1]):
 			current = get_perp(links[index_p][0],links[index_p][1],links[index_p+1][0],links[index_p+1][1],posx[0],posx[1])
-			if(computeDistance(current, posx ) < 0.15):
+			if(computeDistance(current, posx ) < 0.100):
 				candidates.append(current)
 				roads[current] = index_l
 	return candidates
@@ -144,7 +143,6 @@ def probesParser(file):
 	longitude = probes_data.longitude.tolist()
 	probes_coordinates = zip(latitude,longitude)
 
-
 def buildCSV(line, index):
 	"Build one line of the output CSV"
 	#sampleID
@@ -193,11 +191,15 @@ def FindMatchedSequence (cisArray,all_probes):
 	#  compute the probabilities for the first line only
 	sizeOfFirstLine = len(cisArray[0]) 
 
+	print all_probes[0]
+	print "fff"
+
 	for index in range(0,sizeOfFirstLine) :
 		# need a function that  takes a  projected point an returns prob of that projection
-		f[0][index] = NewComputeProbCandidates(all_probes[0],cisArray,0,index)
+		f[0][index] = NewComputeProbCandidates(all_probes[65],cisArray,0,index)
 	# main algorithm, starts from the second line
-
+	print f
+	print " jjjjjjjjjjjjjjjjjjjjjjjjjj"
 	for index in range(1,numberoflines):
 		# size of current line
 		sizeOfCurrentLine = len(cisArray[index]) 
@@ -207,18 +209,20 @@ def FindMatchedSequence (cisArray,all_probes):
 			sizeofPreviousLine = len(cisArray[index -1 ]) 
 			for elementInPreviousLine in range(0,sizeofPreviousLine):
 
-				alt = f[index-1][elementInPreviousLine] + NewComputeProbCandidates(all_probes[index],cisArray,index,element)
+				alt = f[index-1][elementInPreviousLine] + NewComputeProbCandidates(all_probes[65+index],cisArray,index,element)
 				#print "alt :"  + str(alt)
+				#print ">>>>>" + str(elementInPreviousLine)
+				#print len(cisArray[index])
 				if alt > max2:
 					max2 = alt
-					pre[index][element] = cisArray[index][elementInPreviousLine]
+					pre[index][element] = cisArray[index-1][elementInPreviousLine]
 				f[index][element] = max2
-	'''
+	
 	print f
 	print " -----------"
 	print "pre :"
 	print pre
-	'''
+	
 	#loop back 
 	returnList = []
 	for element in range(numberoflines-1,0,-1):
@@ -250,14 +254,14 @@ roads = dict()
 print "Parsing: " + sys.argv[1]
 linksParser(sys.argv[1])
 
-print "Printing first 5 segments:"
-print road_segments[0:4]
+print "Printing segments 65 to 70:"
+print road_segments[65:70]
 
 print "Parsing: " + sys.argv[2]
 probesParser(sys.argv[2])
 
-print "Printing first 5 probes:"
-print probes_coordinates[0:4]
+print "Printing probes 65 to 70: "
+print probes_coordinates[65:70]
 
 print "All files have been parsed."
 
@@ -265,19 +269,37 @@ print "Computing candidates."
 
 all_candidates =  []
 #
-lower = 0
-upper = 5
+lower = 65
+upper = 125
 
-for index, currentPosition in enumerate(probes_coordinates[0:5]):
+for index, currentPosition in enumerate(probes_coordinates[65:125]):
 
 	all_candidates.append(computeCandidates(currentPosition, road_segments, lower, upper))
 	upper += 1
-	if index > 5:
+	if index > 65:
 		lower += 1
 
-print "Printing Candidates for the first 5 probes: "
-print all_candidates[0:4]
+for index, probes in enumerate(probes_coordinates[65:125]):
+	print probes
+'''
+print "#########################"
 
+for index, cand in enumerate(all_candidates[60:125]):
+	print cand
+'''
+
+final_candidates = FindMatchedSequence(all_candidates,probes_coordinates)
+
+print "#########################"
+for n in final_candidates:
+	print n
+#for index, out in enumerate(final_candidates[65:125]):
+#	print out		
+'''
+print "Printing Candidates 65 to 70:"
+print all_candidates[65:70]
+'''
+'''
 print "Printing Dictionnary: "
 print roads
 
@@ -304,4 +326,4 @@ for index,line_id in enumerate(candidate_lines):
 
 print "Output CSV:"
 print output_csv
-
+'''

@@ -6,6 +6,8 @@ Rssources:
 
 https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/Map-Matching20for20Low-Sampling-Rate20GPS20Trajectories-cameraReady.pdf
 
+https://www.darrinward.com/lat-long/?id=2736396
+
 TO-DO:
 ------
 refactor the code
