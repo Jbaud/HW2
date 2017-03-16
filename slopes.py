@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import pandas
 import scipy.stats
 import operator
-
+from shapely.geometry import LineString, Point
+'''
 def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	" Compute the projection"
 	"""************************************************************************************************ 
@@ -27,6 +28,36 @@ def get_perp( X1, Y1, X2, Y2, X3, Y3):
 	#if X4 < X2 and X4 > X1 and Y4 < Y2 and Y4 > Y1:
 	return X4,Y4
 	#return None
+'''
+
+def get_perp( X1, Y1, X2, Y2, X3, Y3):
+    " Compute the projection"
+    """************************************************************************************************
+    Purpose - X1,Y1,X2,Y2 = Two points representing the ends of the line segment
+              X3,Y3 = The offset point
+    'Returns - X4,Y4 = Returns the Point on the line perpendicular to the offset or None if no such
+                        point exists
+    '************************************************************************************************ """
+    '''
+ 
+    XX = X2 - X1
+    YY = Y2 - Y1
+    ShortestLength = ((XX * (X3 - X1)) + (YY * (Y3 - Y1))) / ((XX * XX) + (YY * YY))
+    X4 = X1 + XX * ShortestLength
+    Y4 = Y1 + YY * ShortestLength
+    #if X4 < X2 and X4 > X1 and Y4 < Y2 and Y4 > Y1:
+    return X4,Y4
+    #return None
+    '''
+    a = (X1,Y1)
+    b=(X2,Y2)
+    line = LineString([a,b])  
+    p = Point(X3,Y3)
+    #p = Point(51.4969521202147,9.3878052290529)
+    #print line.project(p)
+    np = line.interpolate(line.project(p))
+    print np
+    return np.x,np.y
 
 def normpdf(x, mean, sd):
 	" Compute the probability (standart deviation)"
@@ -64,7 +95,7 @@ def computeCandidates(posx,zipped, lower, upper):
 	for index_l, links  in enumerate(zipped[lower:upper]) :
 		for index_p,link_points in enumerate(links[:-1]):
 			current = get_perp(links[index_p][0],links[index_p][1],links[index_p+1][0],links[index_p+1][1],posx[0],posx[1])
-			if(computeDistance(current, posx ) < 0.100):
+			if(computeDistance(current, posx ) < 0.15):
 				candidates.append(current)
 				roads[current] = index_l
 	return candidates
@@ -191,9 +222,10 @@ def FindMatchedSequence (cisArray,all_probes):
 	#  compute the probabilities for the first line only
 	sizeOfFirstLine = len(cisArray[0]) 
 
+	'''
 	print all_probes[0]
 	print "fff"
-
+	'''
 	for index in range(0,sizeOfFirstLine) :
 		# need a function that  takes a  projected point an returns prob of that projection
 		f[0][index] = NewComputeProbCandidates(all_probes[65],cisArray,0,index)
@@ -217,12 +249,12 @@ def FindMatchedSequence (cisArray,all_probes):
 					max2 = alt
 					pre[index][element] = cisArray[index-1][elementInPreviousLine]
 				f[index][element] = max2
-	
+	'''
 	print f
 	print " -----------"
 	print "pre :"
 	print pre
-	
+	'''
 	#loop back 
 	returnList = []
 	for element in range(numberoflines-1,0,-1):
@@ -255,13 +287,13 @@ print "Parsing: " + sys.argv[1]
 linksParser(sys.argv[1])
 
 print "Printing segments 65 to 70:"
-print road_segments[65:70]
+print road_segments[0:125]
 
 print "Parsing: " + sys.argv[2]
 probesParser(sys.argv[2])
 
 print "Printing probes 65 to 70: "
-print probes_coordinates[65:70]
+print probes_coordinates[0:125]
 
 print "All files have been parsed."
 
@@ -269,43 +301,43 @@ print "Computing candidates."
 
 all_candidates =  []
 #
-lower = 65
+lower = 0
 upper = 125
 
-for index, currentPosition in enumerate(probes_coordinates[65:125]):
+for index, currentPosition in enumerate(probes_coordinates[0:125]):
 
 	all_candidates.append(computeCandidates(currentPosition, road_segments, lower, upper))
 	upper += 1
-	if index > 65:
+	if index > 30:
 		lower += 1
 
-for index, probes in enumerate(probes_coordinates[65:125]):
-	print probes
 '''
+for index, probes in enumerate(probes_coordinates[0:125]):
+	print probes
+
 print "#########################"
 
-for index, cand in enumerate(all_candidates[60:125]):
+for index, cand in enumerate(all_candidates[0:125]):
 	print cand
 '''
-
 final_candidates = FindMatchedSequence(all_candidates,probes_coordinates)
 
+'''
 print "#########################"
 for n in final_candidates:
 	print n
 #for index, out in enumerate(final_candidates[65:125]):
 #	print out		
-'''
+
 print "Printing Candidates 65 to 70:"
-print all_candidates[65:70]
-'''
-'''
+print all_candidates[0:125]
+
 print "Printing Dictionnary: "
 print roads
 
 print "Finding sequence."
-final_candidates = FindMatchedSequence(all_candidates,probes_coordinates)
-
+'''
+'''
 print "Printing the first 5 selected candidates:"
 print final_candidates
 
